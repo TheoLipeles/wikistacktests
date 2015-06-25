@@ -103,11 +103,10 @@ router.post('/add/submit', function(req, res) {
 
   tags.forEach(function(tag) {
     newPage.tags.addToSet(tag)
-  })
-
+  },
   newPage.save(function(err, page) {
     res.redirect(page.full_route)
-  })
+  }))
 })
 
 router.get('/add', function(req, res) {
