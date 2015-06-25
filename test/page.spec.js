@@ -19,9 +19,9 @@ describe("Wikistack Model", function() {
 			page2.title = "The title2!";
 			page3.body = "Somebody3...";
 			page3.title = "The title3!";
-			// page2.tags = ["text1", "text2", 'text3'];
-			// page3.tags = ["text4", "text5", 'text6'];
-			// page.tags = ["text7", "text1", 'text4'];
+			page2.tags = ["text1", "text2", 'text3'];
+			page3.tags = ["text10", "text5", 'text6'];
+			page.tags = ["text7", "text1", 'text4'];
 			page.save(function(){
 				page2.save(function(){
 					page3.save(function(){
@@ -30,8 +30,10 @@ describe("Wikistack Model", function() {
 				});
 			});
 		});
-		afterEach(function(){
-			Page.remove({});
+		afterEach(function(done){
+			Page.remove({}, function() {
+				done();
+			});
 		});
 		describe("Validation", function() {
 			it("doesn't return error if title is valid", function(done) {
@@ -61,24 +63,34 @@ describe("Wikistack Model", function() {
 			describe("getSimilar", function() {
 				it("returns pages with same tag", function(done){
 					page.getSimilar(function(err, pages){
-						console.log(pages);
-						expect(pages).to.equal(pages);
+						expect(pages[0].id).to.equal(page2.id);
 						done();
 					});
 				});
 			});
 		});
 		describe("Hooks", function() {
-			it("calls computeUrlName before saving");
+			it("calls computeUrlName before saving", function() {
+				var spy = chai.spy(this.computeUrlName);
+				expect(spy).to.have.been.called;
+			});
 		});
 		describe("Virtuals", function() {
 			describe("full_route", function() {
-				it("returns full url");
+				it("returns full url", function(done) {
+					expect(page.full_route).to.equal("/wiki/" + page.url_name);
+					done();
+				});
 			});
 		});
-		describe("Statistics", function() {
+		describe("Statics", function() {
 			describe("findByTag", function() {
-				it("returns pages with same tag");
+				it("returns pages with same tag", function(done) {
+					Page.findByTag("text10", function(err, pages) {
+						expect(pages[0].id).to.equal(page3.id);
+						done();
+					});
+				});
 			});
 		});
 	});
